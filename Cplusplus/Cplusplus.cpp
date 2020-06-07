@@ -5,14 +5,13 @@
 #include <GLFW\glfw3.h>
 #include <iostream>
 #include <Shader.h>
+#include <Renderer.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
-void BindTriangle(GLuint *VAO, GLuint  *VBO, float *vertices, int len);
-//void ValidateShaderCompiled(unsigned int shader, bool isProgram);
 
 //float vertices[] = {
 //	// first triangle
@@ -91,40 +90,12 @@ int main()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(data); // FREE DATA. we in c++ BUD
 
-	//Triangle preperation:
-	unsigned int VBO[3], VAO[3];
-	unsigned int EBO; 
-
-	glGenBuffers(3, VBO);
-	glGenVertexArrays(3, VAO);
-
 	//First triagle
-	glBindVertexArray(VAO[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); //Bind it
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //Static, as implied, set once, used many times
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // starts at 0
-
-	glGenBuffers(1, &EBO); //ELEMENT BUFFER OBJECTS
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	
-
+	Renderer objectA(vertices, sizeof(vertices), indices, sizeof(indices) / sizeof(indices[0]));
 	//Second
-	BindTriangle(&VAO[1], &VBO[1], vertices2, sizeof(vertices2));
-	std::cout << sizeof(vertices3)/sizeof(vertices3[0]) << std::endl;
-	BindTriangle(&VAO[2], &VBO[2], vertices3, sizeof(vertices3)/sizeof(vertices3[0]));
+	Renderer ObjectB(vertices2, sizeof(vertices2), 3);
 	//Third
-	glBindVertexArray(VAO[2]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); //Bind it
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices3), vertices3, GL_STATIC_DRAW); //Static, as implied, set once, used many times
-
-	// position attrib
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // starts at 0
-	glEnableVertexAttribArray(0);
-	// color attrib
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	Renderer ObjectC(vertices3, sizeof(vertices3), 3);
 
 	////Uncomment to draw as wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -144,66 +115,27 @@ int main()
 		shader1.SetFloat4("ourColor", 0.0f, greenValue, 0, 1);
 		// But we have to use the shader before setting it.
 
-		glBindVertexArray(VAO[0]);
-		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0); //Use EBO to draw rect
+		objectA.Render();
+		//glBindVertexArray(VAO[0]);
+		//glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0); //Use EBO to draw rect
 
 		shader2.use();
-		glBindVertexArray(VAO[1]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		ObjectB.Render();
+		//glBindVertexArray(VAO[1]);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
 
-		glBindVertexArray(VAO[2]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		ObjectC.Render();
+		//glBindVertexArray(VAO[2]);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	// optional: de-allocate all resources once they've outlived their purpose:
-	// ------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAO[0]);
-	glDeleteVertexArrays(1, &VAO[1]);
-	glDeleteBuffers(1, &VBO[0]);
-	glDeleteBuffers(1, &VBO[1]);
 	//glDeleteProgram(shaderProgram);
 
 	glfwTerminate(); // Call to free resources
     std::cout << "Window closed.\n";
 }
 
-void BindTriangle(GLuint  *VAO, GLuint  *VBO, float *vertices, int len)
-{
-	glBindVertexArray(*VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, *VBO); //Bind it
-	glBufferData(GL_ARRAY_BUFFER, len, vertices2, GL_STATIC_DRAW); //Static, as implied, set once, used many times
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW); //Static, as implied, set once, used many times
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // starts at 0
-	glEnableVertexAttribArray(0);
-	//enable colors now
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-}
-
-//void ValidateShaderCompiled(unsigned int shader, bool isProgram)
-//{
-//	//check is success
-//	int success;
-//	char infoLog[512];
-//	if (isProgram) {
-//		glGetProgramiv(shader, GL_LINK_STATUS, &success);
-//	}
-//	else {
-//		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-//	}
-//	if (!success)
-//	{
-//		if (isProgram) {
-//			glGetProgramInfoLog(shader, 512, NULL, infoLog);
-//		}
-//		else {
-//			glGetShaderInfoLog(shader, 512, NULL, infoLog);
-//		}
-//		std::cout << "ERROR::SHADER::COMPILATION::FAILED\n" << infoLog << std::endl;
-//	}
-//}
 
 void process_input(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
