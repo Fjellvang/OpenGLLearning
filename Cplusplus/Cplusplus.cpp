@@ -6,8 +6,12 @@
 #include <iostream>
 #include <Shader.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
+void BindTriangle(GLuint *VAO, GLuint  *VBO, float *vertices, int len);
 //void ValidateShaderCompiled(unsigned int shader, bool isProgram);
 
 //float vertices[] = {
@@ -77,6 +81,15 @@ int main()
 	Shader shader2("D:\\Projects\\Cplusplus\\Cplusplus\\vertShaderColor.v", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShaderColor.f");
 	//Shader shader2("D:\\Projects\\Cplusplus\\Cplusplus\\vertexShader1.v", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShader.f");
 
+	//TEXTURE
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("D:\\Projects\\Cplusplus\\Assets\\container.jpg", &width, &height, &nrChannels, 0);
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D/* generate tex to currently bound target*/, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(data); // FREE DATA. we in c++ BUD
 
 	//Triangle preperation:
 	unsigned int VBO[3], VAO[3];
@@ -98,16 +111,10 @@ int main()
 	
 
 	//Second
-	glBindVertexArray(VAO[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]); //Bind it
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW); //Static, as implied, set once, used many times
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // starts at 0
-	glEnableVertexAttribArray(0);
-	//enable colors now
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	//thirds
+	BindTriangle(&VAO[1], &VBO[1], vertices2, sizeof(vertices2));
+	std::cout << sizeof(vertices3)/sizeof(vertices3[0]) << std::endl;
+	BindTriangle(&VAO[2], &VBO[2], vertices3, sizeof(vertices3)/sizeof(vertices3[0]));
+	//Third
 	glBindVertexArray(VAO[2]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); //Bind it
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices3), vertices3, GL_STATIC_DRAW); //Static, as implied, set once, used many times
@@ -119,7 +126,7 @@ int main()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	//Uncomment to draw as wireframe
+	////Uncomment to draw as wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(window))
 	{
@@ -131,15 +138,16 @@ int main()
 		auto timevalue = glfwGetTime();
 		float greenValue = (sin(timevalue) / 2.0f) + 0.5f;
 		//We can find the uniform before using the shader program
+
 		shader1.use();
-		//shader1.SetFloat("posX", sin(timevalue) * 1.5);
-		//shader1.SetFloat4("ourColor", 0.0f, greenValue, 0, 1);
+		shader1.SetFloat("posX", sin(timevalue) * 1.5);
+		shader1.SetFloat4("ourColor", 0.0f, greenValue, 0, 1);
 		// But we have to use the shader before setting it.
 
 		glBindVertexArray(VAO[0]);
 		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0); //Use EBO to draw rect
 
-		//shader2.use();
+		shader2.use();
 		glBindVertexArray(VAO[1]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -158,6 +166,20 @@ int main()
 
 	glfwTerminate(); // Call to free resources
     std::cout << "Window closed.\n";
+}
+
+void BindTriangle(GLuint  *VAO, GLuint  *VBO, float *vertices, int len)
+{
+	glBindVertexArray(*VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, *VBO); //Bind it
+	glBufferData(GL_ARRAY_BUFFER, len, vertices2, GL_STATIC_DRAW); //Static, as implied, set once, used many times
+
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW); //Static, as implied, set once, used many times
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // starts at 0
+	glEnableVertexAttribArray(0);
+	//enable colors now
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 //void ValidateShaderCompiled(unsigned int shader, bool isProgram)

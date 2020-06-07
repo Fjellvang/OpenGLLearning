@@ -19,6 +19,9 @@
     <Filter Include="Header Files\Shaders">
       <UniqueIdentifier>{55472783-21fe-41d0-8ebf-d8d6b6502e30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderes">
+      <UniqueIdentifier>{ead5125e-d24c-4090-9f78-b39906ce5e28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cplusplus.cpp">
@@ -30,6 +33,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Aleks\Documents\glfw-3.3.2.bin.WIN64\include\glad\glad.h">
@@ -37,6 +43,12 @@
     </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
