@@ -58,10 +58,16 @@
     <None Include="vertShaderColor.v">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="fragShaderColor.f">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
     <None Include="fragShaderWithUniform.f">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="fragShaderColor.f">
+    <None Include="vertShaderWithTexture.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="fragShaderWithTexture.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

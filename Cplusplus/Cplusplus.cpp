@@ -45,6 +45,18 @@ float vertices2[] = {
 	0.3f, -0.1f, 0.0f,1.0f, 0.0f, 0.0f
 };
 
+float rectangle[] = {
+	// positions          // colors           // texture coords
+	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
+unsigned int rectIndices[] = {
+	0,1,2,
+	2,3,0
+};
+
 unsigned int indices[] = {  // note that we start from 0!
 	0, 1, 2,   // first triangle
 	1, 3, 4,    // second triangle
@@ -78,16 +90,28 @@ int main()
 
 	Shader shader1("D:\\Projects\\Cplusplus\\Cplusplus\\vertexShader1.v", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShaderWithUniform.f");
 	Shader shader2("D:\\Projects\\Cplusplus\\Cplusplus\\vertShaderColor.v", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShaderColor.f");
-	//Shader shader2("D:\\Projects\\Cplusplus\\Cplusplus\\vertexShader1.v", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShader.f");
+	Shader shader3("D:\\Projects\\Cplusplus\\Cplusplus\\vertShaderWithTexture.vert", "D:\\Projects\\Cplusplus\\Cplusplus\\fragShaderWithTexture.frag");
 
 	//TEXTURE
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("D:\\Projects\\Cplusplus\\Assets\\container.jpg", &width, &height, &nrChannels, 0);
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D/* generate tex to currently bound target*/, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	// set texture wrapping/filtering options.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//Load and generate texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("D:\\Projects\\Cplusplus\\Assets\\container.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D/* generate tex to currently bound target*/, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}	
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
 	stbi_image_free(data); // FREE DATA. we in c++ BUD
 
 	//First triagle
@@ -96,6 +120,7 @@ int main()
 	Renderer ObjectB(vertices2, sizeof(vertices2), 3);
 	//Third
 	Renderer ObjectC(vertices3, sizeof(vertices3), 3);
+	Renderer Rect(rectangle, sizeof(rectangle), rectIndices, sizeof(rectIndices) / sizeof(rectIndices[0]), 3);
 
 	////Uncomment to draw as wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -107,12 +132,15 @@ int main()
 
 		/// Use time to make it osciliate between green and black
 		auto timevalue = glfwGetTime();
-		float greenValue = (sin(timevalue) / 2.0f) + 0.5f;
+		float greenValue = (float)(sin(timevalue) / 2.0f) + 0.5f;
 		//We can find the uniform before using the shader program
 
+		shader3.use();
+		glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
+		Rect.Render();
 		shader1.use();
-		shader1.SetFloat("posX", sin(timevalue) * 1.5);
-		shader1.SetFloat4("ourColor", 0.0f, greenValue, 0, 1);
+		shader1.SetFloat("posX", sin(timevalue) * 1.5f);
+		shader1.SetFloat4("ourColor", 1.0f, greenValue, 0, 1);
 		// But we have to use the shader before setting it.
 
 		objectA.Render();
@@ -127,6 +155,7 @@ int main()
 		ObjectC.Render();
 		//glBindVertexArray(VAO[2]);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
