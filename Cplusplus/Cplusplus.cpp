@@ -75,11 +75,6 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //This line is only for macOS
 
-	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0));
-	vec = trans * vec;
-	std::cout << vec.x << vec.y << vec.z << std::endl;
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
@@ -158,6 +153,9 @@ int main()
 
 	////Uncomment to draw as wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // rotate 90 around z;
+	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
 	while (!glfwWindowShouldClose(window))
 	{
 		process_input(window);
@@ -168,15 +166,36 @@ int main()
 		auto timevalue = glfwGetTime();
 		float greenValue = (float)(sin(timevalue) / 2.0f) + 0.5f;
 		//We can find the uniform before using the shader program
-
+		
+		glm::mat4 trans{ glm::mat4(1.0f) };
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::rotate(trans, (float)timevalue, glm::vec3(0.0f, 0.0f, 1.0f));
 		shader3.use();
 		shader3.SetInt("texture1", 0);
 		shader3.SetInt("texture2", 1);
+		shader3.SetMat4("transform", &trans);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		Rect.Render();
+
+		glm::mat4 trans2{ glm::mat4(1.0f) };
+		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+		trans2 = glm::scale(trans2, glm::vec3(sin(timevalue), sin(timevalue), sin(timevalue)));
+		trans2 = glm::rotate(trans2, (float)timevalue, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		shader3.use();
+		shader3.SetInt("texture1", 0);
+		shader3.SetInt("texture2", 1);
+		shader3.SetMat4("transform", &trans2);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, texture2);
+		Rect.Render();
+
+
 		shader1.use();
 		shader1.SetFloat("posX", sin(timevalue) * 1.5f);
 		shader1.SetFloat4("ourColor", 1.0f, greenValue, 0, 1);
