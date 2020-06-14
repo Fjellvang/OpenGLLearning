@@ -79,9 +79,9 @@
 		glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, a);
 	}
 
-	void Shader::SetMat4(const std::string& name, glm::mat4* mat) const {
+	void Shader::SetMat4(const std::string& name, const glm::mat4 &mat) const {
 		unsigned int transformLoc = glGetUniformLocation(ID, name.c_str());
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(*mat));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mat));
 	}
 
 	//TODO: Deconstructor with delete program?

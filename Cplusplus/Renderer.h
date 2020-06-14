@@ -6,16 +6,18 @@
 class Renderer
 {
 public:
-	unsigned int VBO[1], VAO[1];
+	unsigned int VBO, VAO;
 	unsigned int EBO; 
 	Renderer(float vertArray[], unsigned long long vertSize, unsigned int *indicesArray, unsigned long long indicesSize);
 	Renderer(float vertArray[], unsigned long long vertSize, unsigned int* indicesArray, unsigned long long indicesSize, int colorStart);//Todo refactor this mess
 
 	~Renderer();
 	///
-	/// Case of colors defined in vert array
+	///3 Case of colors defined in vert array
 	///
 	Renderer(float *vertArray, unsigned long long vertSize, int colorStart);
+	// with tex and no color..
+	Renderer(float* vertArray, unsigned long long vertSize);
 	virtual void Render();
 private:
 	bool useEBO;

@@ -56,6 +56,50 @@ float rectangle[] = {
 	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 };
+
+float cube[] = {
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
 unsigned int rectIndices[] = {
 	0,1,2,
 	2,3,0
@@ -102,12 +146,13 @@ int main()
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// set texture wrapping/filtering options.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//Load and generate texture
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load("D:\\Projects\\Cplusplus\\Assets\\container.jpg", &width, &height, &nrChannels, 0);
 	if (data)
 	{
@@ -130,7 +175,6 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//Load and generate texture
 	//int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data2 = stbi_load("D:\\Projects\\Cplusplus\\Assets\\awesomeface.png", &width, &height, &nrChannels, 0);
 	if (data2)
 	{
@@ -150,17 +194,22 @@ int main()
 	//Third
 	Renderer ObjectC(vertices3, sizeof(vertices3), 3);
 	Renderer Rect(rectangle, sizeof(rectangle), rectIndices, sizeof(rectIndices) / sizeof(rectIndices[0]), 3);
+	Renderer Cube(cube, sizeof(cube));
 
 	////Uncomment to draw as wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // rotate 90 around z;
 	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 
+	shader3.use();
+	shader3.SetInt("texture1", 0);
+	shader3.SetInt("texture2", 1);
+	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(window))
 	{
 		process_input(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		/// Use time to make it osciliate between green and black
 		auto timevalue = glfwGetTime();
@@ -171,21 +220,21 @@ int main()
 		glm::mat4 view{ glm::mat4(1.0f) };
 		glm::mat4 projection{ glm::mat4(1.0f) };
 
-		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // rotation around x, lay it down.
+		model = glm::rotate(model, (float)timevalue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); // rotation around x, lay it down.
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); // move scene backwards.
-
-		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f); //TODO: 800/600 in variables
-		shader3.use();
-		shader3.SetInt("texture1", 0);
-		shader3.SetInt("texture2", 1);
-		shader3.SetMat4("projection", &projection);
-		shader3.SetMat4("view", &view);
-		shader3.SetMat4("model", &model);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
+		shader3.use();
+
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f); //TODO: 800/600 in variables
+		shader3.SetMat4("projection", projection);
+		shader3.SetMat4("view", view);
+		shader3.SetMat4("model", model);
+
+		Cube.Render();
 		Rect.Render();
 
 
