@@ -167,44 +167,37 @@ int main()
 		float greenValue = (float)(sin(timevalue) / 2.0f) + 0.5f;
 		//We can find the uniform before using the shader program
 		
-		glm::mat4 trans{ glm::mat4(1.0f) };
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::rotate(trans, (float)timevalue, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 model{ glm::mat4(1.0f) };
+		glm::mat4 view{ glm::mat4(1.0f) };
+		glm::mat4 projection{ glm::mat4(1.0f) };
+
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // rotation around x, lay it down.
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); // move scene backwards.
+
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f); //TODO: 800/600 in variables
 		shader3.use();
 		shader3.SetInt("texture1", 0);
 		shader3.SetInt("texture2", 1);
-		shader3.SetMat4("transform", &trans);
+		shader3.SetMat4("projection", &projection);
+		shader3.SetMat4("view", &view);
+		shader3.SetMat4("model", &model);
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		Rect.Render();
 
-		glm::mat4 trans2{ glm::mat4(1.0f) };
-		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-		trans2 = glm::scale(trans2, glm::vec3(sin(timevalue), sin(timevalue), sin(timevalue)));
-		trans2 = glm::rotate(trans2, (float)timevalue, glm::vec3(0.0f, 0.0f, 1.0f));
 
-		shader3.use();
-		shader3.SetInt("texture1", 0);
-		shader3.SetInt("texture2", 1);
-		shader3.SetMat4("transform", &trans2);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, texture2);
-		Rect.Render();
+		//shader1.use();
+		//shader1.SetFloat("posX", sin(timevalue) * 1.5f);
+		//shader1.SetFloat4("ourColor", 1.0f, greenValue, 0, 1);
+		//// But we have to use the shader before setting it.
 
-
-		shader1.use();
-		shader1.SetFloat("posX", sin(timevalue) * 1.5f);
-		shader1.SetFloat4("ourColor", 1.0f, greenValue, 0, 1);
-		// But we have to use the shader before setting it.
-
-		objectA.Render();
-		shader2.use();
-		ObjectB.Render();
-		ObjectC.Render();
+		//objectA.Render();
+		//shader2.use();
+		//ObjectB.Render();
+		//ObjectC.Render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
