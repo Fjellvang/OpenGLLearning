@@ -97,8 +97,8 @@ int main()
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	// set texture wrapping/filtering options.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//Load and generate texture
@@ -113,6 +113,30 @@ int main()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data); // FREE DATA. we in c++ BUD
+
+		//TEXTURE
+	unsigned int texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	// set texture wrapping/filtering options.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//Load and generate texture
+	//int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* data2 = stbi_load("D:\\Projects\\Cplusplus\\Assets\\awesomeface.png", &width, &height, &nrChannels, 0);
+	if (data2)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA /* NOTE! this is PNG, so add alpha channel*/, GL_UNSIGNED_BYTE, data2);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data2); // FREE DATA. we in c++ BUD
+
 
 	//First triagle
 	Renderer objectA(vertices, sizeof(vertices), indices, sizeof(indices) / sizeof(indices[0]));
@@ -136,7 +160,12 @@ int main()
 		//We can find the uniform before using the shader program
 
 		shader3.use();
+		shader3.SetInt("texture1", 0);
+		shader3.SetInt("texture2", 1);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);//TODO: REFACTOR THIS IN...
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
 		Rect.Render();
 		shader1.use();
 		shader1.SetFloat("posX", sin(timevalue) * 1.5f);
@@ -144,17 +173,9 @@ int main()
 		// But we have to use the shader before setting it.
 
 		objectA.Render();
-		//glBindVertexArray(VAO[0]);
-		//glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, 0); //Use EBO to draw rect
-
 		shader2.use();
 		ObjectB.Render();
-		//glBindVertexArray(VAO[1]);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-
 		ObjectC.Render();
-		//glBindVertexArray(VAO[2]);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

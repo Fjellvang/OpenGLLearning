@@ -69,6 +69,7 @@ Renderer::Renderer(float* vertArray, unsigned long long vertSize, int colorStart
 	useEBO = false;
 	EBO = NULL;
 }
+
 Renderer::~Renderer() {
 	glDeleteVertexArrays(1, &VAO[0]);
 	glDeleteBuffers(1, &VBO[0]);
